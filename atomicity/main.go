@@ -1,0 +1,35 @@
+package main
+
+import (
+	"fmt"
+	"math/rand"
+	"runtime"
+	"sync"
+	"sync/atomic"
+	"time"
+)
+
+var wg sync.WaitGroup
+var counter int64
+
+func init() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+}
+
+func main() {
+	wg.Add(2)
+	go incrementor("Foo")
+	go incrementor("Bar")
+	wg.Wait()
+	fmt.Println("Final Counter: ", counter)
+}
+
+func incrementor(s string) {
+	for i := 0; i < 10; i++ {
+		time.Sleep(time.Duration(rand.Intn(3) * int(time.Millisecond)))
+
+		atomic.AddInt64(&counter, 1)
+		fmt.Println(s, i, "Counter: ", counter)
+	}
+	wg.Done()
+}
