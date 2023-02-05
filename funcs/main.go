@@ -102,4 +102,20 @@ func main() {
 	changeMe(&age)
 	fmt.Println(age)
 
+	func() {
+		fmt.Println("Let's try anonymous")
+	}()
+
+	numbers := []int{2, 5, 9, 1}
+	largest := func(n ...int) int {
+		var large int
+		for _, i := range n {
+			if i > large {
+				large = i
+			}
+		}
+		return large
+	}(numbers...)
+	fmt.Println(largest)
+
 }
