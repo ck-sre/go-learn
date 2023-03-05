@@ -25,3 +25,5 @@ go.work
 #IDE
 .DS_Store
 .idea
+
+*.example
