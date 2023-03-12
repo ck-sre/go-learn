@@ -3,20 +3,33 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 )
 
-// var ErrCustom error
-var ErrCustom = errors.New("custom error type for negative sqrt")
-
-func main() {
-	fmt.Printf("%T\n", ErrCustom)
-	_, err := sqrt(-10)
-	fmt.Println(err)
+type reduxError struct {
+	sev string
+	err error
 }
 
-func sqrt(n int) (float64, error) {
-	if n < 0 {
-		return 0, ErrCustom
+func (k reduxError) Error() string {
+	return fmt.Sprintf("an error of sev %v occurred: %v", k.sev, k.err)
+}
+
+func main() {
+	_, err := cube(-22)
+
+	if err != nil {
+		log.Fatal(err)
 	}
-	return 42, nil
+}
+
+func cube(f float64) (float64, error) {
+	if f < 0 {
+		fmt.Printf("%T\n", errors.New("headlessmath"))
+		//return 0, errors.New("headless math")
+		//return 0, fmt.Errorf("headless math:  %v", f)
+		re := fmt.Errorf("mindless error being thrown, this is the err object")
+		return 0, reduxError{"error", re}
+	}
+	return 48, nil
 }
