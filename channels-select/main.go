@@ -1,18 +1,40 @@
 package main
 
-import "fmt"
+import (
+	"context"
+	"fmt"
+	"runtime"
+	"time"
+)
 
 func main() {
-	f := make(chan int)
+	cx, breakFree := context.WithCancel(context.Background())
+
+	fmt.Println("error check:", cx.Err())
+	fmt.Println("total goroutines:", runtime.NumGoroutine())
+
 	go func() {
-		for i := 0; i < 5; i++ {
-			f <- i
+		v := 0
+		for {
+			select {
+			case <-cx.Done():
+				return
+			default:
+				v++
+				time.Sleep(time.Millisecond * 100)
+				fmt.Println("Still chugging along", v)
+			}
 		}
-		close(f)
 	}()
 
-	for k := range f {
-		fmt.Println(k)
-	}
-	fmt.Println("done sending and receiving")
+	time.Sleep(time.Second * 2)
+	fmt.Println("is there an error now?", cx.Err())
+	fmt.Println("num routines next check:", runtime.NumGoroutine())
+
+	fmt.Println("cancelling ctx now")
+	breakFree()
+	fmt.Println("cancelled cx")
+	time.Sleep(time.Second * 2)
+	fmt.Println("3rd error check", cx.Err())
+	fmt.Println("num routines", runtime.NumGoroutine())
 }
